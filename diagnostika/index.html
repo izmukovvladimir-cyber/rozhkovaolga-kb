@@ -30,6 +30,7 @@ button#go{width:100%;background:var(--accent);color:#fff;border:0;border-radius:
 .pract{background:var(--soft);border-radius:9px;padding:12px 14px;margin:14px 0}
 .cta{display:block;text-align:center;background:var(--accent);color:#fff;text-decoration:none;border-radius:10px;padding:14px;font-weight:600;margin-top:14px}
 .giftbtn{display:block;text-align:center;border:1px solid var(--accent);color:var(--accent);text-decoration:none;border-radius:10px;padding:13px;font-weight:600;margin-top:10px}
+.keep{color:var(--muted);font-size:14px;margin:14px 0 4px}
 .again{background:none;color:var(--muted);border:0;font-size:15px;margin-top:16px;text-decoration:underline;cursor:pointer;padding:6px}
 .policy{text-align:center;font-size:13px;margin:26px 0 0}
 .policy a{color:var(--muted)}
@@ -58,6 +59,29 @@ QS.forEach((q,i)=>{
     '<label><input type="radio" name="q'+i+'" value="'+o[1]+'">'+o[0]+'</label>').join('');
   f.appendChild(d);
 });
+function showResult(sum, restored){
+  const r=RES.find(x=>sum>=x.min&&sum<=x.max);
+  const box=document.getElementById('result');
+  box.innerHTML='<div class="rescard"><span class="band">'+sum+' '+ballov(sum)+' из 32</span>'+
+    '<h2>«'+r.name+'»</h2>'+r.body.map(p=>'<p>'+p+'</p>').join('')+
+    '<div class="pract"><strong>Практика на пять минут.</strong> '+r.practice+'</div>'+
+    '<p><strong>Ваш следующий шаг.</strong> '+r.step+'</p>'+
+    '<a class="cta" href="'+r.url+'" target="_blank" rel="noopener">'+r.cta+'</a>'+
+    '<a class="giftbtn" href="'+GIFT+'" target="_blank" rel="noopener">Забрать подарок «Формула кадра»</a>'+
+    '<p class="keep">Обе кнопки остаются доступными. Вернётесь на страницу, результат будет здесь же.</p>'+
+    '<button class="again" id="again">Пройти заново</button></div>';
+  if(!restored){
+    try{localStorage.setItem('quizResult',String(sum));}catch(e){}
+    if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_RESULT',{tip:r.name,ball:sum});}
+  }
+  box.querySelector('.cta').addEventListener('click',function(){if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_CTA',{tip:r.name});}});
+  box.querySelector('.giftbtn').addEventListener('click',function(){if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_GIFT',{tip:r.name});}});
+  document.getElementById('again').addEventListener('click',function(){
+    try{localStorage.removeItem('quizResult');}catch(e){}
+    location.reload();
+  });
+  box.style.display='block';
+}
 document.getElementById('go').onclick=function(){
   let sum=0, all=true;
   for(let i=0;i<QS.length;i++){
@@ -67,20 +91,16 @@ document.getElementById('go').onclick=function(){
   const w=document.getElementById('warn');
   if(!all){w.style.display='block';return;}
   w.style.display='none';
-  const r=RES.find(x=>sum>=x.min&&sum<=x.max);
-  const box=document.getElementById('result');
-  box.innerHTML='<div class="rescard"><span class="band">'+sum+' '+ballov(sum)+' из 32</span>'+
-    '<h2>«'+r.name+'»</h2>'+r.body.map(p=>'<p>'+p+'</p>').join('')+
-    '<div class="pract"><strong>Практика на пять минут.</strong> '+r.practice+'</div>'+
-    '<p><strong>Ваш следующий шаг.</strong> '+r.step+'</p>'+
-    '<a class="cta" href="'+r.url+'" target="_blank" rel="noopener">'+r.cta+'</a>'+
-    '<a class="giftbtn" href="'+GIFT+'" target="_blank" rel="noopener">Забрать подарок «Формула кадра»</a>'+
-    '<button class="again" onclick="location.reload()">Пройти заново</button></div>';
-  if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_RESULT',{tip:r.name,ball:sum});}
-  box.querySelector('.cta').addEventListener('click',function(){if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_CTA',{tip:r.name});}});
-  box.querySelector('.giftbtn').addEventListener('click',function(){if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_GIFT',{tip:r.name});}});
-  box.style.display='block';
-  box.scrollIntoView({behavior:'smooth'});
+  showResult(sum,false);
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
 };
+(function(){
+  let saved=null;
+  try{saved=localStorage.getItem('quizResult');}catch(e){}
+  if(saved!==null&&saved!==''){
+    const sum=parseInt(saved,10);
+    if(!isNaN(sum)&&sum>=8&&sum<=32){showResult(sum,true);}
+  }
+})();
 </script>
 </div></body></html>
