@@ -67,6 +67,7 @@ function showResult(sum, restored){
     '<div class="pract"><strong>Практика на пять минут.</strong> '+r.practice+'</div>'+
     '<p><strong>Ваш следующий шаг.</strong> '+r.step+'</p>'+
     '<a class="cta" href="'+r.url+'" target="_blank" rel="noopener">'+r.cta+'</a>'+
+    '<a class="cta site" style="background:transparent;color:var(--accent);border:1px solid var(--accent)" href="https://rozhkovaolga.ru/?from=diagnostika" target="_blank" rel="noopener">На сайте: курсы по позированию от 1 990 ₽ и личная работа со мной</a>'+
     '<a class="giftbtn" href="'+GIFT+'" target="_blank" rel="noopener">Забрать подарок «Формула кадра»</a>'+
     '<p class="keep">Обе кнопки остаются доступными. Вернётесь на страницу, результат будет здесь же.</p>'+
     '<button class="again" id="again">Пройти заново</button></div>';
@@ -74,7 +75,7 @@ function showResult(sum, restored){
     try{localStorage.setItem('quizResult',String(sum));}catch(e){}
     if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_RESULT',{tip:r.name,ball:sum});}
   }
-  box.querySelector('.cta').addEventListener('click',function(){if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_CTA',{tip:r.name});}});
+  box.querySelector('.cta:not(.site)').addEventListener('click',function(){if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_CTA',{tip:r.name});}});
   box.querySelector('.giftbtn').addEventListener('click',function(){if(window.ym){ym(METRIKA_ID,'reachGoal','TEST_GIFT',{tip:r.name});}});
   document.getElementById('again').addEventListener('click',function(){
     try{localStorage.removeItem('quizResult');}catch(e){}
